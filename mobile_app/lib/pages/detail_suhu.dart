@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:monitoring_app/services/api_service.dart';
+import '../services/api_service.dart';
 import '../components/custom_app_bar.dart';
 import '../components/custom_bottom_navbar.dart';
 import '../components/data_terkini.dart';

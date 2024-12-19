@@ -1,16 +1,13 @@
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'dart:convert';
-import 'message_data.dart';
-import '../services/api_service.dart';
 
 class MqttService {
   final String broker;
-  final List<String> topics;
-  // final ApiService apiService;
+  final String topics;
   MqttServerClient? client;
 
-  Function(String, double)? onMessageReceived;
+  Function(String, int)? onMessageReceived;
 
   MqttService(this.broker, this.topics);
 
@@ -40,9 +37,7 @@ class MqttService {
   void _subscribeToTopics() {
     if (client!.connectionStatus!.state == MqttConnectionState.connected) {
       print('Connected to MQTT broker!');
-      for (String topic in topics) {
-        client!.subscribe(topic, MqttQos.atLeastOnce);
-      }
+      client!.subscribe(topics, MqttQos.atLeastOnce);
       client!.updates!.listen(_onMessage);
     } else {
       print('Failed to connect, status is ${client!.connectionStatus}');
@@ -52,18 +47,10 @@ class MqttService {
   void _onMessage(List<MqttReceivedMessage<MqttMessage>> messages) {
     final MqttPublishMessage recMess = messages[0].payload as MqttPublishMessage;
     final String message = MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
-    String topic = messages[0].topic;
-    String currentTime = DateTime.now().toIso8601String();
-    double doubleValue = double.parse(message);
-
-    print(message);
-    print(messages);
+    int intValue = int.parse(message);
 
     if (onMessageReceived != null) {
-      onMessageReceived!(topic, doubleValue);
-
-      // konversi data ke double
-      // double? numericValue = double.tryParse(message);
+      onMessageReceived!(topics, intValue);
     } else {
       print("No message received");
     }
@@ -71,15 +58,6 @@ class MqttService {
 
   void disconnect() {
     client?.disconnect();
-  }
-
-  Map<String, dynamic>? _parseJson(String jsonData) {
-    try {
-      return jsonDecode(jsonData);
-    } catch (e) {
-      print('Error parsing message: $e');
-      return null;
-    }
   }
 
   void _onConnected() => print('Connected to broker');

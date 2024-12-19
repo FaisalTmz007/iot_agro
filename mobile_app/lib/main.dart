@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:monitoring_app/pages/register.dart';
+import 'pages/register.dart';
 import 'mqtt/mqtt_service.dart';
-import 'services/api_service.dart';
 import 'pages/home.dart';
 import 'pages/login.dart';
 import 'components/loading_screen.dart';
@@ -22,24 +21,18 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final MqttService mqttService = MqttService(
     'broker.hivemq.com',
-    ['temp/mufrih', 'humid/mufrih']
+    'iotAgro/relay'
     // ApiService(),
   );
 
-  double tempMessage = 0;
-  double humidMessage = 0;
+  int tempMessage = 0;
+  int humidMessage = 0;
 
-  void _onMessageReceived(String topic, double message) {
+  void _onMessageReceived(String topic, int message) {
     setState(() {
-      if (topic == 'temp/mufrih') {
-        tempMessage = message;
-        print(message);
-        print(message.runtimeType);
-      } else if (topic == 'humid/mufrih') {
-        humidMessage = message;
-        print(message);
-        print(message.runtimeType);
-      }
+      tempMessage = message;
+      print(message);
+      print(message.runtimeType);
     });
   }
 
@@ -62,12 +55,11 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => LoadingScreen(),
-        '/login': (context) => LoginScreen(),
-        '/register': (context) => RegisterScreen(),
-        '/home': (context) => HomeScreen(tempMessage: tempMessage, humidMessage: humidMessage),
-        '/suhu': (context) => TemperatureScreen(currentTemp: tempMessage,),
-        '/kelembapan': (context) => RiwayatSuhuPage()
+        '/': (context) => HomeScreen(tempMessage: tempMessage, humidMessage: humidMessage),
+        // '/login': (context) => LoginScreen(),
+        // '/register': (context) => RegisterScreen(),
+        // '/suhu': (context) => TemperatureScreen(currentTemp: tempMessage,),
+        // '/kelembapan': (context) => RiwayatSuhuPage()
       },
     );
   }
